@@ -92,12 +92,15 @@ def do_web_update(env):
 	# Add the PRIMARY_HOST configuration first so it becomes nginx's default server.
 	nginx_conf += make_domain_config(env['PRIMARY_HOSTNAME'], [template0, template1, template2], ssl_certificates, env)
 
+	env_limit_domains = env['LIMIT_DOMAINS'].split(",") if env['LIMIT_DOMAINS'] else []
+
 	# Add configuration all other web domains.
 	has_root_proxy_or_redirect = get_web_domains_with_root_overrides(env)
 	web_domains_not_redirect = get_web_domains(env, include_www_redirects=False)
 	for domain in get_web_domains(env):
-		if domain == env['PRIMARY_HOSTNAME']:
+		if domain == env['PRIMARY_HOSTNAME'] or domain not in env_limit_domains:
 			# PRIMARY_HOSTNAME is handled above.
+			print(f"domain: {domain} is either PRIMARY_HOSTNAME or is not included in LIMIT_DOMAINS. skipping.")
 			continue
 		if domain in web_domains_not_redirect:
 			# This is a regular domain.

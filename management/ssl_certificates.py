@@ -379,9 +379,10 @@ def provision_certificates_cmdline():
 
 	Lock(die=True).forever()
 	env = load_environment()
+	env_limit_domains = env['LIMIT_DOMAINS']
 
 	quiet = False
-	domains = []
+	domains = env_limit_domains.split(",") if env_limit_domains else []
 
 	for arg in sys.argv[1:]:
 		if arg == "-q":
